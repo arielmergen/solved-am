@@ -1,26 +1,57 @@
-import { Request, Response, NextFunction } from 'express';
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
-import dotenv from 'dotenv';
+import cors from 'cors';
+import multer from 'multer';
+import * as dotenv from 'dotenv';
+import * as path from 'path';
+import candidateRouter from './routes/candidate.routes';
+import { errorHandler } from './middleware/error.middleware';
+import swaggerUi from 'swagger-ui-express';
+import { swaggerSpec } from './config/swagger';
 
 dotenv.config();
-const prisma = new PrismaClient();
-
 export const app = express();
-export default prisma;
+export const prisma = new PrismaClient();
 
-const port = 3010;
+// Configuración de CORS
+const corsOptions = {
+  origin: process.env.CORS_ORIGIN || '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
 
+app.use(cors(corsOptions));
+app.use(express.json());
+
+// Configurar directorio de uploads
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+
+// Ruta raíz
 app.get('/', (req, res) => {
-  res.send('Hola LTI!');
+  res.status(200).send('Hello World!');
 });
 
-app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-  console.error(err.stack);
-  res.type('text/plain'); 
-  res.status(500).send('Something broke!');
-});
+// Rutas
+app.use('/api/candidates', candidateRouter);
 
-app.listen(port, () => {
-  console.log(`Server is running at http://localhost:${port}`);
-});
+// Documentación Swagger
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+// Middleware de manejo de errores
+app.use(errorHandler);
+
+// Validar formato de teléfono
+const validatePhoneFormat = (phone: string): boolean => {
+  const phoneRegex = /^\+?[0-9]{10,15}$/;
+  return phoneRegex.test(phone);
+};
+
+// Solo iniciar el servidor si no estamos en modo test
+if (process.env.NODE_ENV !== 'test') {
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
+}
+
+export default app;

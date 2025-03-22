@@ -13,8 +13,67 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum CandidateStatus {
+  DRAFT
+  ACTIVE
+  INACTIVE
+}
+
+enum ChangeType {
+  CREATE
+  UPDATE
+  DELETE
+}
+
 model User {
   id    Int     @id @default(autoincrement())
   email String  @unique
   name  String?
+}
+
+model Candidate {
+  id          Int       @id @default(autoincrement())
+  firstName   String
+  lastName    String
+  email       String    @unique
+  phone       String?
+  address     String?
+  education   Education[]
+  experience  WorkExperience[]
+  cvPath      String?
+  status      CandidateStatus @default(DRAFT)
+  history     CandidateHistory[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Education {
+  id          Int       @id @default(autoincrement())
+  title       String
+  institution String
+  startDate   DateTime?
+  endDate     DateTime?
+  isComplete  Boolean
+  candidate   Candidate @relation(fields: [candidateId], references: [id])
+  candidateId Int
+}
+
+model WorkExperience {
+  id          Int       @id @default(autoincrement())
+  company     String
+  position    String
+  startDate   DateTime
+  endDate     DateTime?
+  description String
+  candidate   Candidate @relation(fields: [candidateId], references: [id])
+  candidateId Int
+}
+
+model CandidateHistory {
+  id          Int      @id @default(autoincrement())
+  candidateId Int
+  candidate   Candidate @relation(fields: [candidateId], references: [id])
+  changeType  ChangeType
+  changes     Json
+  createdAt   DateTime @default(now())
 }

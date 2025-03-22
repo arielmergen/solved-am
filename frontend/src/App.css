@@ -36,3 +36,83 @@
     transform: rotate(360deg);
   }
 }
+
+.logo {
+  float: left;
+  width: 120px;
+  height: 31px;
+  margin: 16px 24px 16px 0;
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.site-layout-content {
+  min-height: 280px;
+  padding: 24px;
+  background: #fff;
+}
+
+.ant-row-rtl .logo {
+  float: right;
+  margin: 16px 0 16px 24px;
+}
+
+.layout {
+  min-height: 100vh;
+}
+
+.header-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+/* Estilos para el formulario */
+.candidate-form {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* Estilos para la tabla de candidatos */
+.candidate-table {
+  margin-top: 16px;
+}
+
+/* Estilos para los detalles del candidato */
+.candidate-detail {
+  margin-bottom: 24px;
+}
+
+.history-timeline {
+  margin-top: 24px;
+  padding: 16px;
+}
+
+/* Estilos para las tarjetas */
+.ant-card {
+  margin-bottom: 16px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.ant-card-head {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+/* Estilos para los botones de acción */
+.action-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+/* Estilos para los tags de estado */
+.status-tag {
+  min-width: 70px;
+  text-align: center;
+}
+
+/* Estilos para el footer */
+.ant-layout-footer {
+  text-align: center;
+  background: #f0f2f5;
+  padding: 16px 50px;
+}
