@@ -1,95 +1,131 @@
-# LTI - Sistema de Seguimiento de Talento
+# LTI - Sistema de Gestión de Candidatos
 
-Este proyecto es una aplicación full-stack con un frontend en React y un backend en Express usando Prisma como ORM. El frontend se inicia con Create React App y el backend está escrito en TypeScript.
+Este proyecto es una aplicación full-stack que permite gestionar candidatos, con un frontend en React/TypeScript y un backend en Node.js/Express/TypeScript, usando Prisma como ORM y PostgreSQL como base de datos.
 
-## Explicación de Directorios y Archivos
+## Características
 
-- `backend/`: Contiene el código del lado del servidor escrito en Node.js.
-  - `src/`: Contiene el código fuente para el backend.
-    - `index.ts`: El punto de entrada para el servidor backend.
-  - `prisma/`: Contiene el archivo de esquema de Prisma para ORM.
-  - `tsconfig.json`: Archivo de configuración de TypeScript.
-  - `.env`: Contiene las variables de entorno.
-- `frontend/`: Contiene el código del lado del cliente escrito en React.
-  - `src/`: Contiene el código fuente para el frontend.
-  - `public/`: Contiene archivos estáticos como el archivo HTML e imágenes.
-  - `build/`: Contiene la construcción lista para producción del frontend.
-- `docker-compose.yml`: Contiene la configuración de Docker Compose para gestionar los servicios de tu aplicación.
-- `README.md`: Este archivo contiene información sobre el proyecto e instrucciones sobre cómo ejecutarlo.
+- ✨ Gestión completa de candidatos (CRUD)
+- 📝 Formularios validados para crear y editar candidatos
+- 📊 Lista de candidatos con filtrado y paginación
+- 🔍 Vista detallada de candidatos
+- 🔒 Gestión de estados de candidatos (DRAFT, ACTIVE, INACTIVE)
+- 📅 Registro de fechas de creación y actualización
+- 🎨 Interfaz moderna con Ant Design
+- 🐳 Configuración Docker lista para usar
+
+## Requisitos Previos
+
+- Node.js (v18 o superior)
+- Docker y Docker Compose
+- Git
+
+## Instalación y Configuración
+
+1. Clona el repositorio:
+```bash
+git clone <url-del-repositorio>
+cd <nombre-del-directorio>
+```
+
+2. Configura las variables de entorno:
+
+En el directorio `backend`, crea un archivo `.env`:
+```env
+DATABASE_URL="postgresql://LTIdbUser:D1ymf8wyQEGthFR1E9xhCq@localhost:5432/LTIdb"
+PORT=3010
+```
+
+En el directorio `frontend`, crea un archivo `.env`:
+```env
+PORT=3001
+VITE_API_URL=http://localhost:3010
+```
+
+3. Inicia los servicios con Docker Compose:
+```bash
+docker-compose up -d
+```
+
+Esto iniciará:
+- Base de datos PostgreSQL
+- Backend en el puerto 3010
+- Frontend en el puerto 3001
 
 ## Estructura del Proyecto
 
-El proyecto está dividido en dos directorios principales: `frontend` y `backend`.
+### Frontend (`/frontend`)
+- `/src/components`: Componentes React
+- `/src/services`: Servicios de API
+- `/src/types`: Tipos TypeScript
+- `/src/App.tsx`: Componente principal
 
-### Frontend
+### Backend (`/backend`)
+- `/src/controllers`: Controladores de la API
+- `/src/routes`: Rutas de la API
+- `/src/types`: Tipos TypeScript
+- `/prisma`: Esquema de la base de datos
 
-El frontend es una aplicación React y sus archivos principales están ubicados en el directorio `src`. El directorio `public` contiene activos estáticos y el directorio `build` contiene la construcción de producción de la aplicación.
+## Desarrollo
 
-### Backend
+Para desarrollo local sin Docker:
 
-El backend es una aplicación Express escrita en TypeScript.
-- El directorio `src` contiene el código fuente
-- El directorio `prisma` contiene el esquema de Prisma.
+1. Backend:
+```bash
+cd backend
+npm install
+npm run prisma:generate
+npm run dev
+```
 
-## Primeros Pasos
-
-Para comenzar con este proyecto, sigue estos pasos:
-
-1. Clona el repositorio.
-2. Instala las dependencias para el frontend y el backend:
-```sh
+2. Frontend:
+```bash
 cd frontend
 npm install
-
-cd ../backend
-npm install
-```
-3. Construye el servidor backend:
-```
-cd backend
-npm run build
-````
-4. Inicia el servidor backend:
-```
-cd backend
-npm run dev 
+npm run start
 ```
 
-5. En una nueva ventana de terminal, construye el servidor frontend:
-```
-cd frontend
-npm run build
-```
-6. Inicia el servidor frontend:
-```
-cd frontend
-npm start
+## Acceso
+
+- Frontend: http://localhost:3001
+- Backend API: http://localhost:3010
+- API Docs: http://localhost:3010/api-docs
+
+## Base de Datos
+
+PostgreSQL está configurado con:
+- Host: localhost
+- Puerto: 5432
+- Usuario: LTIdbUser
+- Contraseña: D1ymf8wyQEGthFR1E9xhCq
+- Base de datos: LTIdb
+
+## Comandos Útiles
+
+```bash
+# Reiniciar todos los servicios
+docker-compose down && docker-compose up -d
+
+# Ver logs
+docker-compose logs -f
+
+# Regenerar tipos de Prisma
+cd backend && npm run prisma:generate
+
+# Ejecutar migraciones
+cd backend && npm run prisma:migrate
+
+# Construir frontend
+cd frontend && npm run build
 ```
 
-El servidor backend estará corriendo en http://localhost:3010 y el frontend estará disponible en http://localhost:3000.
+## Solución de Problemas
 
-## Docker y PostgreSQL
+1. Si el backend no se conecta a la base de datos:
+   - Verifica que PostgreSQL esté corriendo: `docker-compose ps`
+   - Verifica las credenciales en `.env`
+   - Espera unos segundos después de iniciar Docker
 
-Este proyecto usa Docker para ejecutar una base de datos PostgreSQL. Así es cómo ponerlo en marcha:
-
-Instala Docker en tu máquina si aún no lo has hecho. Puedes descargarlo desde aquí.
-Navega al directorio raíz del proyecto en tu terminal.
-Ejecuta el siguiente comando para iniciar el contenedor Docker:
-```
-docker-compose up -d
-```
-Esto iniciará una base de datos PostgreSQL en un contenedor Docker. La bandera -d corre el contenedor en modo separado, lo que significa que se ejecuta en segundo plano.
-
-Para acceder a la base de datos PostgreSQL, puedes usar cualquier cliente PostgreSQL con los siguientes detalles de conexión:
- - Host: localhost
- - Port: 5432
- - User: postgres
- - Password: password
- - Database: mydatabase
-
-Por favor, reemplaza User, Password y Database con el usuario, la contraseña y el nombre de la base de datos reales especificados en tu archivo .env.
-
-Para detener el contenedor Docker, ejecuta el siguiente comando:
-```
-docker-compose down
-```
+2. Si el frontend no se conecta al backend:
+   - Verifica que el backend esté corriendo
+   - Confirma la URL en `VITE_API_URL`
+   - Revisa la consola del navegador para errores CORS
