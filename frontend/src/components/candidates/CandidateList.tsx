@@ -1,148 +1,85 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Tag, Space, Button, Popconfirm, message } from 'antd';
-import { EditOutlined, DeleteOutlined, EyeOutlined, FileOutlined } from '@ant-design/icons';
-import { Candidate, CandidateStatus } from '../../types/candidate.types';
-import { candidateService } from '../../services/api';
+import { Table, Button, Space, message } from 'antd';
+import { EditOutlined, EyeOutlined } from '@ant-design/icons';
+import { Candidate } from '../../types/candidate.types';
+import api from '../../services/api';
 
 interface CandidateListProps {
-  onEdit?: (candidate: Candidate) => void;
-  onView?: (candidate: Candidate) => void;
+  onEdit: (candidate: Candidate) => void;
+  onView: (candidate: Candidate) => void;
 }
 
 const CandidateList: React.FC<CandidateListProps> = ({ onEdit, onView }) => {
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const fetchCandidates = async () => {
-    try {
-      setLoading(true);
-      const data = await candidateService.getAllCandidates();
-      setCandidates(data);
-    } catch (error) {
-      console.error('Error al obtener candidatos:', error);
-      message.error('Error al cargar los candidatos');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchCandidates();
+    loadCandidates();
   }, []);
 
-  const handleDelete = async (id: number) => {
+  const loadCandidates = async () => {
     try {
       setLoading(true);
-      await candidateService.deleteCandidate(id);
-      message.success('Candidato eliminado correctamente');
-      fetchCandidates();
-    } catch (error) {
-      console.error('Error al eliminar candidato:', error);
-      message.error('Error al eliminar el candidato');
+      console.log('Iniciando carga de candidatos...');
+      const data = await api.candidates.getAll();
+      console.log('Respuesta del servidor:', data);
+      setCandidates(data);
+      console.log('Candidatos actualizados en el estado:', data.length);
+    } catch (error: any) {
+      console.error('Error al cargar candidatos:', error);
+      console.error('Detalles del error:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      });
+      message.error(`Error al cargar los candidatos: ${error.response?.data?.error || error.message}`);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handlePublish = async (id: number) => {
-    try {
-      setLoading(true);
-      await candidateService.publishCandidate(id);
-      message.success('Candidato publicado correctamente');
-      fetchCandidates();
-    } catch (error) {
-      console.error('Error al publicar candidato:', error);
-      message.error('Error al publicar el candidato');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const getStatusTag = (status: CandidateStatus) => {
-    switch (status) {
-      case CandidateStatus.DRAFT:
-        return <Tag color="blue">Borrador</Tag>;
-      case CandidateStatus.ACTIVE:
-        return <Tag color="green">Activo</Tag>;
-      case CandidateStatus.INACTIVE:
-        return <Tag color="red">Inactivo</Tag>;
-      default:
-        return <Tag>Desconocido</Tag>;
     }
   };
 
   const columns = [
-    {
+    { 
       title: 'Nombre',
-      dataIndex: 'firstName',
-      key: 'firstName',
-      render: (text: string, record: Candidate) => `${record.firstName} ${record.lastName}`
+      key: 'fullName',
+      render: (record: Candidate) => `${record.firstName} ${record.lastName}`
     },
-    {
+    { 
       title: 'Email',
       dataIndex: 'email',
-      key: 'email',
+      key: 'email'
     },
-    {
+    { 
       title: 'Teléfono',
       dataIndex: 'phone',
-      key: 'phone',
+      key: 'phone'
+    },
+    { 
+      title: 'Dirección',
+      dataIndex: 'address',
+      key: 'address'
     },
     {
       title: 'Estado',
       dataIndex: 'status',
       key: 'status',
-      render: (status: CandidateStatus) => getStatusTag(status)
-    },
-    {
-      title: 'CV',
-      key: 'cv',
-      render: (text: string, record: Candidate) => (
-        record.cvPath ? (
-          <a href={record.cvPath} target="_blank" rel="noopener noreferrer">
-            <FileOutlined /> Ver CV
-          </a>
-        ) : (
-          <span>No disponible</span>
-        )
-      )
+      render: (status: string) => status || 'DRAFT'
     },
     {
       title: 'Acciones',
       key: 'actions',
-      render: (text: string, record: Candidate) => (
+      render: (_: any, record: Candidate) => (
         <Space size="middle">
           <Button 
-            icon={<EyeOutlined />} 
-            onClick={() => onView && onView(record)}
-            title="Ver detalles"
+            icon={<EditOutlined />} 
+            onClick={() => onEdit(record)}
+            title="Editar candidato"
           />
           <Button 
-            icon={<EditOutlined />} 
-            onClick={() => onEdit && onEdit(record)}
-            title="Editar"
+            icon={<EyeOutlined />} 
+            onClick={() => onView(record)}
+            title="Ver detalles"
           />
-          {record.status === CandidateStatus.DRAFT && (
-            <Button 
-              type="primary"
-              onClick={() => handlePublish(record.id!)}
-              disabled={!record.id}
-            >
-              Publicar
-            </Button>
-          )}
-          <Popconfirm
-            title="¿Está seguro de eliminar este candidato?"
-            onConfirm={() => record.id && handleDelete(record.id)}
-            okText="Sí"
-            cancelText="No"
-          >
-            <Button 
-              danger 
-              icon={<DeleteOutlined />}
-              title="Eliminar"
-            />
-          </Popconfirm>
         </Space>
       ),
     },
@@ -151,11 +88,12 @@ const CandidateList: React.FC<CandidateListProps> = ({ onEdit, onView }) => {
   return (
     <Table 
       columns={columns} 
-      dataSource={candidates.map(c => ({ ...c, key: c.id }))} 
+      dataSource={candidates} 
+      rowKey="id" 
       loading={loading}
       pagination={{ pageSize: 10 }}
     />
   );
 };
 
-export default CandidateList; 
+export default CandidateList;

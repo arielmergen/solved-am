@@ -1,9 +1,3 @@
-export enum CandidateStatus {
-  DRAFT = 'DRAFT',
-  ACTIVE = 'ACTIVE',
-  INACTIVE = 'INACTIVE'
-}
-
 export interface Candidate {
   id?: number;
   firstName: string;
@@ -11,31 +5,28 @@ export interface Candidate {
   email: string;
   phone?: string;
   address?: string;
-  status: CandidateStatus;
   cvPath?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  history?: CandidateHistory[];
+  status?: 'DRAFT' | 'ACTIVE' | 'INACTIVE';
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
-export interface CandidateHistory {
-  id: number;
-  candidateId: number;
-  changeType: 'CREATE' | 'UPDATE' | 'DELETE';
-  changes: string;
-  createdAt: string;
+export interface WorkExperience {
+  id?: number;
+  company: string;
+  position: string;
+  startDate: Date;
+  endDate?: Date;
+  description: string;
+  candidateId?: number;
 }
 
-export interface CandidateFormData {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  address: string;
+export interface Education {
+  id?: number;
+  title: string;
+  institution: string;
+  startDate?: Date;
+  endDate?: Date;
+  isComplete: boolean;
+  candidateId?: number;
 }
-
-export interface HistoryChange {
-  field: string;
-  oldValue: any;
-  newValue: any;
-} 

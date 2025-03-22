@@ -1,66 +1,33 @@
 import axios from 'axios';
-import { Candidate, CandidateFormData } from '../types/candidate.types';
+import { Candidate } from '../types/candidate.types';
 
-// Usar la variable de entorno o el valor por defecto
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3000';
+const API_URL = import.meta.env.VITE_API_URL || 'http://backend:3010';
 
-console.log('API URL:', API_URL); // Para depuración
+const api = {
+  candidates: {
+    getAll: async (): Promise<Candidate[]> => {
+      const response = await axios.get(`${API_URL}/api/candidates`);
+      return response.data;
+    },
 
-const api = axios.create({
-  baseURL: API_URL,
-  headers: {
-    'Content-Type': 'application/json'
-  }
-});
+    getById: async (id: number): Promise<Candidate> => {
+      const response = await axios.get(`${API_URL}/api/candidates/${id}`);
+      return response.data;
+    },
 
-export const candidateService = {
-  // Obtener todos los candidatos
-  getAllCandidates: async (): Promise<Candidate[]> => {
-    const response = await api.get('/api/candidates');
-    return response.data;
-  },
+    create: async (candidate: Omit<Candidate, 'id'>): Promise<Candidate> => {
+      const response = await axios.post(`${API_URL}/api/candidates`, candidate);
+      return response.data;
+    },
 
-  // Obtener un candidato por ID
-  getCandidate: async (id: number): Promise<Candidate> => {
-    const response = await api.get(`/api/candidates/${id}`);
-    return response.data;
-  },
+    update: async (id: number, candidate: Candidate): Promise<Candidate> => {
+      const response = await axios.put(`${API_URL}/api/candidates/${id}`, candidate);
+      return response.data;
+    },
 
-  // Crear un nuevo candidato
-  createCandidate: async (candidateData: CandidateFormData): Promise<Candidate> => {
-    const response = await api.post('/api/candidates', candidateData);
-    return response.data;
-  },
-
-  // Actualizar un candidato
-  updateCandidate: async (id: number, candidateData: Partial<CandidateFormData>): Promise<Candidate> => {
-    const response = await api.put(`/api/candidates/${id}`, candidateData);
-    return response.data;
-  },
-
-  // Eliminar un candidato
-  deleteCandidate: async (id: number): Promise<void> => {
-    await api.delete(`/api/candidates/${id}`);
-  },
-
-  // Publicar un candidato (cambiar estado a ACTIVE)
-  publishCandidate: async (id: number): Promise<Candidate> => {
-    const response = await api.post(`/api/candidates/${id}/publish`);
-    return response.data;
-  },
-
-  // Subir CV
-  uploadCV: async (id: number, file: File): Promise<Candidate> => {
-    const formData = new FormData();
-    formData.append('cv', file);
-    
-    const response = await api.post(`/api/candidates/${id}/cv`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    });
-    
-    return response.data;
+    delete: async (id: number): Promise<void> => {
+      await axios.delete(`${API_URL}/api/candidates/${id}`);
+    }
   }
 };
 
